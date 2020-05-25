@@ -1,8 +1,8 @@
 //To get started: https://www.digitalocean.com/community/tutorials/setting-up-a-node-project-with-typescript
-import express from 'express';
+import express from "express";
 import graphqlHTTP from "express-graphql";
 import { buildSchema } from "graphql";
-import { ApolloServer, gql } from 'apollo-server';
+import { ApolloServer, gql } from "apollo-server";
 
 const typeDefs = gql`
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
@@ -23,12 +23,12 @@ const typeDefs = gql`
 
 const books = [
   {
-    title: 'Harry Potter and the Chamber of Secrets',
-    author: 'J.K. Rowling',
+    title: "Harry Potter and the Chamber of Secrets",
+    author: "J.K. Rowling",
   },
   {
-    title: 'Jurassic Park',
-    author: 'Michael Crichton',
+    title: "Jurassic Park",
+    author: "Michael Crichton",
   },
 ];
 
@@ -53,10 +53,10 @@ const app = express();
 
 const port = 3000;
 
-app.get('/', (req, res) => {
-  res.send('The sedulous hyena ate the antelope!');
+app.get("/", (req, res) => {
+  res.send("The sedulous hyena ate the antelope!");
 });
-app.listen(port, err => {
+app.listen(port, (err) => {
   if (err) {
     return console.error(err);
   }
