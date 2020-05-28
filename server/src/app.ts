@@ -3,6 +3,7 @@ import express from "express";
 import graphqlHTTP from "express-graphql";
 import { buildSchema } from "graphql";
 import { ApolloServer, gql } from "apollo-server";
+const db = require("./models/index.js");
 
 const typeDefs = gql`
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
@@ -36,13 +37,16 @@ const books = [
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
   Query: {
-    books: () => books,
+    books: (root: any, args: any, { db }: any) => {
+      console.log(root, args, db);
+      return books;
+    },
   },
 };
 
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ typeDefs, resolvers, context: { db } });
 
 // The `listen` method launches a web server.
 server.listen().then(({ url }) => {

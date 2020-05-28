@@ -10,6 +10,8 @@
   "author": "kfiggins",
   "license": "ISC",
   "dependencies": {
+    "@types/bluebird": "^3.5.32",
+    "@types/validator": "^13.0.0",
     "apollo-server": "^2.13.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
