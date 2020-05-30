@@ -33,4 +33,20 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+// ASSOCIATIONS
+db.platform.hasMany(db.item)
+db.user.hasMany(db.item)
+db.user.hasMany(db.tag)
+db.item.hasMany(db.vote)
+db.tag.hasMany(db.vote)
+db.user.hasMany(db.vote)
+
+db.tag.belongsTo(db.user)
+db.item.belongsTo(db.platform)
+db.item.belongsTo(db.user)
+db.vote.belongsTo(db.item)
+db.vote.belongsTo(db.tag)
+db.vote.belongsTo(db.user)
+
+
 module.exports = db;
