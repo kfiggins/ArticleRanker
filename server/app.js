@@ -19,8 +19,8 @@ const typeDefs = gql`
     name: String
     userId: Int
     createdById: Int
-    # createdAt: Date
-    # updatedAt: Date
+    createdAt: Date
+    updatedAt: Date
   }
 
   type Item {
@@ -31,18 +31,17 @@ const typeDefs = gql`
     description: String
     link: String
     userId: Int
-    # createdAt: Date
-    # updatedAt: Date
+    createdAt: Date
+    updatedAt: Date
   }
 
   type User {
     id: Int
     email: String
-    #Should it be a String?
     password: String
     username: String
-    # createdAt: Date
-    # updatedAt: Date
+    createdAt: Date
+    updatedAt: Date
   }
 
   type Vote {
@@ -50,8 +49,8 @@ const typeDefs = gql`
     tagId: Int
     userId: Int
     itemId: Int
-    # createdAt: Date
-    # updatedAt: Date
+    createdAt: Date
+    updatedAt: Date
   }
 
   # The "Query" type is special: it lists all of the available queries that
@@ -63,6 +62,10 @@ const typeDefs = gql`
     tag: [Tag]
     user: [User]
     vote: [Vote]
+  }
+
+  type Mutation {
+    createPlatform(name: String): Platform
   }
 `;
 
@@ -84,6 +87,17 @@ const resolvers = {
     },
     vote: (root, args, { db }) => {
       return db.platform.findAll();
+    },
+  },
+  Mutation: {
+    createPlatform: async (_, args, { db }) => {
+      const results = await db.platform.create({ name: args.name });
+      console.log(results);
+      return {
+        success: results && results.length,
+        message: "platfom created",
+        id: results.dataValues.id,
+      };
     },
   },
   Date: new GraphQLScalarType({
