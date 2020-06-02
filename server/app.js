@@ -17,21 +17,52 @@ const typeDefs = gql`
   type Tag {
     id: Int
     name: String
-    userId: createdById
-    createdAt: Date
-    updatedAt: Date
+    userId: Int
+    createdById: Int
+    # createdAt: Date
+    # updatedAt: Date
   }
 
   type Item {
-    
+    id: Int
+    platformId: Int
+    createdById: Int
+    name: String
+    description: String
+    link: String
+    userId: Int
+    # createdAt: Date
+    # updatedAt: Date
+  }
+
+  type User {
+    id: Int
+    email: String
+    #Should it be a String?
+    password: String
+    username: String
+    # createdAt: Date
+    # updatedAt: Date
+  }
+
+  type Vote {
+    id: Int
+    tagId: Int
+    userId: Int
+    itemId: Int
+    # createdAt: Date
+    # updatedAt: Date
   }
 
   # The "Query" type is special: it lists all of the available queries that
   # clients can execute, along with the return type for each. In this
   # case, the "books" query returns an array of zero or more Books (defined above).
   type Query {
+    item: [Item]
     platform: [Platform]
     tag: [Tag]
+    user: [User]
+    vote: [Vote]
   }
 `;
 
@@ -39,11 +70,20 @@ const typeDefs = gql`
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
   Query: {
+    item: (root, args, { db }) => {
+      return db.platform.findAll();
+    },
     platform: (root, args, { db }) => {
       return db.platform.findAll();
     },
     tag: (root, args, { db }) => {
       return db.tag.findAll();
+    },
+    user: (root, args, { db }) => {
+      return db.tag.findAll();
+    },
+    vote: (root, args, { db }) => {
+      return db.platform.findAll();
     },
   },
   Date: new GraphQLScalarType({
