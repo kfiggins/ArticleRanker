@@ -86,13 +86,12 @@ const resolvers = {
       return db.tag.findAll();
     },
     vote: (root, args, { db }) => {
-      return db.platform.findAll();
+      return db.vote.findAll();
     },
   },
   Mutation: {
-    createPlatform: async (_, args, { db }) => {
+    createPlatform: async (root, args, { db }) => {
       const results = await db.platform.create({ name: args.name });
-      console.log(results);
       return {
         success: results && results.length,
         message: "platfom created",
