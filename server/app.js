@@ -1,19 +1,20 @@
-const express = require("express")
+const express = require("express");
 const { ApolloServer, gql } = require("apollo-server-express");
 const db = require("./models/index.js");
+const { GraphQLScalarType } = require("graphql");
 
 const typeDefs = gql`
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-
+  scalar Date
   # This "Book" type defines the queryable fields for every book in our data source.
-  type Platform{
+  type Platform {
     id: Int
     name: String
-    # createdAt: Date
-    # updatedAt: Date
+    createdAt: Date
+    updatedAt: Date
   }
 
-  type Tag{
+  type Tag {
     id: Int
     name: String
     userId: Int
@@ -22,7 +23,7 @@ const typeDefs = gql`
     # updatedAt: Date
   }
 
-  type Item{
+  type Item {
     id: Int
     platformId: Int
     createdById: Int
@@ -34,23 +35,23 @@ const typeDefs = gql`
     # updatedAt: Date
   }
 
-  type User{
+  type User {
     id: Int
     email: String
     #Should it be a String?
     password: String
     username: String
     # createdAt: Date
-    # updatedAt: Date   
+    # updatedAt: Date
   }
 
-  type Vote{
+  type Vote {
     id: Int
     tagId: Int
     userId: Int
     itemId: Int
     # createdAt: Date
-    # updatedAt: Date 
+    # updatedAt: Date
   }
 
   # The "Query" type is special: it lists all of the available queries that
@@ -85,6 +86,22 @@ const resolvers = {
       return db.platform.findAll();
     },
   },
+  Date: new GraphQLScalarType({
+    name: "Date",
+    description: "Date custom scalar type",
+    parseValue(value) {
+      return new Date(value); // value from the client
+    },
+    serialize(value) {
+      return value.getTime(); // value sent to the client
+    },
+    parseLiteral(ast) {
+      if (ast.kind === Kind.INT) {
+        return new Date(+ast.value); // ast value is always in string format
+      }
+      return null;
+    },
+  }),
 };
 
 // The ApolloServer constructor requires two parameters: your schema
@@ -93,23 +110,21 @@ const server = new ApolloServer({ typeDefs, resolvers, context: { db } });
 
 const app = express();
 
-
 server.applyMiddleware({ app }); // app is from an existing express app. Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
 const syncDB = async () => {
-
   // await db.vote.drop()
   // await db.item.drop()
   // await db.tag.drop()
   // await db.user.drop()
   // db.platform.drop()
 
-  await db.platform.sync()
-  await db.user.sync()
-  await db.item.sync()
-  await db.tag.sync()
-  db.vote.sync()
-}
+  await db.platform.sync();
+  await db.user.sync();
+  await db.item.sync();
+  await db.tag.sync();
+  db.vote.sync();
+};
 
 syncDB();
 
