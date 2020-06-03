@@ -65,11 +65,25 @@ const typeDefs = gql`
   }
 
   type Mutation {
+    #Creates
     createPlatform(name: String): Platform
-    createTag(name: String, userId: Int, createdById: Int) : Tag
-    createItem(platformId: Int, createdById: Int, name: String,  description: String, link: String, userId: Int) : Item
-    createUser(email: String, password: String, username: String, ) : User
-    createVote(tagId: Int, userId: Int, itemId: Int) : Vote
+    createTag(name: String, userId: Int, createdById: Int): Tag
+    createItem(
+      platformId: Int
+      createdById: Int
+      name: String
+      description: String
+      link: String
+      userId: Int
+    ): Item
+    createUser(email: String, password: String, username: String): User
+    createVote(tagId: Int, userId: Int, itemId: Int): Vote
+    #Updates
+    # Params are same as create except add id
+    updatePlatform(id: Int, name: String): Boolean
+    #Deletes
+    # Delete should only take id
+    deletePlatform(id: Int): Boolean
   }
 `;
 
@@ -102,37 +116,68 @@ const resolvers = {
         id: results.dataValues.id,
       };
     },
-    createTag: async(root, args, { db }) => {
-      const results = await db.tag.create({userid: args.userid, createById: args.createById})
-      return{
+    createTag: async (root, args, { db }) => {
+      const results = await db.tag.create({
+        userid: args.userid,
+        createById: args.createById,
+      });
+      return {
         success: results && results.length,
         message: "tag created",
         id: results.dataValues.id,
-      } 
+      };
     },
-    createItem: async(root, args, { db }) => {
-      const results = await db.item.create({platformId: args.platformId, createdById: args.createById, name: args.name,  description: description.name, link: args.link, userId: args.userId})
-      return{
+    createItem: async (root, args, { db }) => {
+      const results = await db.item.create({
+        platformId: args.platformId,
+        createdById: args.createById,
+        name: args.name,
+        description: description.name,
+        link: args.link,
+        userId: args.userId,
+      });
+      return {
         success: results && results.length,
         message: "item created",
         id: results.dataValues.id,
-      }
+      };
     },
-    createUser: async(root, args, { db }) => {
-      const results = await db.user.create({email: args.email, password: args.password, username: args.username })
-      return{
+    createUser: async (root, args, { db }) => {
+      const results = await db.user.create({
+        email: args.email,
+        password: args.password,
+        username: args.username,
+      });
+      return {
         success: results && results.length,
         message: "user created",
         id: results.dataValues.id,
-      }
+      };
     },
-    createVote: async(root, args, { db }) => {
-      const results = await db.vote.create({tagId: args.tagId, userId: args.userId})
-      return{
+    createVote: async (root, args, { db }) => {
+      const results = await db.vote.create({ tagId: args.tagId, userId: args.userId });
+      return {
         success: results && results.length,
         message: "vote created",
         id: results.dataValues.id,
-      }
+      };
+    },
+    // Update we need to pass the fields that can be updated, and add a where statement with the id.
+    updatePlatform: async (root, args, { db }) => {
+      const results = await db.platform.update(
+        { name: args.name },
+        { where: { id: args.id } }
+      );
+      return results && results.length;
+    },
+    // Delete should only take id
+    deletePlatform: async (root, args, { db }) => {
+      const result = await db.platform.destroy({
+        where: {
+          id: args.id,
+        },
+      });
+      return !!result;
     },
   },
   Date: new GraphQLScalarType({
