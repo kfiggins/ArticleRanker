@@ -141,8 +141,6 @@ const syncDB = async () => {
 
 syncDB();
 
-// db.sequelize.sync()
-
 const port = 3000;
 
 app.get("/", (req, res) => {
