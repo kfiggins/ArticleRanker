@@ -17,20 +17,18 @@ const typeDefs = gql`
   type Tag {
     id: Int
     name: String
-    userId: Int
-    createdById: Int
+    user: User
     createdAt: Date
     updatedAt: Date
   }
 
   type Item {
     id: Int
-    platformId: Int
-    createdById: Int
+    platform: Platform
+    user: User
     name: String
     description: String
     link: String
-    userId: Int
     createdAt: Date
     updatedAt: Date
   }
@@ -46,9 +44,9 @@ const typeDefs = gql`
 
   type Vote {
     id: Int
-    tagId: Int
-    userId: Int
-    itemId: Int
+    tag: Tag
+    user: User
+    item: Item
     createdAt: Date
     updatedAt: Date
   }
@@ -57,11 +55,12 @@ const typeDefs = gql`
   # clients can execute, along with the return type for each. In this
   # case, the "books" query returns an array of zero or more Books (defined above).
   type Query {
-    item: [Item]
-    platform: [Platform]
-    tag: [Tag]
-    user: [User]
-    vote: [Vote]
+    items: [Item]
+    platforms: [Platform]
+    platform(id: Int!): Platform
+    tags: [Tag]
+    users: [User]
+    votes: [Vote]
   }
 
   type Mutation {
@@ -90,20 +89,23 @@ const typeDefs = gql`
 // Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
+  Item: {
+    platform: (parent, args, { db }) => db.platform.findByPk(parent.dataValues.platformId),
+  },
   Query: {
-    item: (root, args, { db }) => {
+    items: (root, args, { db }) => {
+      return db.item.findAll();
+    },
+    platforms: (root, args, { db }) => {
       return db.platform.findAll();
     },
-    platform: (root, args, { db }) => {
-      return db.platform.findAll();
-    },
-    tag: (root, args, { db }) => {
+    tags: (root, args, { db }) => {
       return db.tag.findAll();
     },
-    user: (root, args, { db }) => {
-      return db.tag.findAll();
+    users: (root, args, { db }) => {
+      return db.user.findAll();
     },
-    vote: (root, args, { db }) => {
+    votes: (root, args, { db }) => {
       return db.vote.findAll();
     },
   },
@@ -130,9 +132,9 @@ const resolvers = {
     createItem: async (root, args, { db }) => {
       const results = await db.item.create({
         platformId: args.platformId,
-        createdById: args.createById,
+        createdById: args.createdById,
         name: args.name,
-        description: description.name,
+        description: args.description,
         link: args.link,
         userId: args.userId,
       });
