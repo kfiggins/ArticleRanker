@@ -91,6 +91,15 @@ const typeDefs = gql`
 const resolvers = {
   Item: {
     platform: (parent, args, { db }) => db.platform.findByPk(parent.dataValues.platformId),
+    user: (parent, args, { db }) => db.user.findByPk(parent.dataValues.userId),
+  },
+  Tag: {
+    user: (parent, args, { db }) => db.user.findByPk(parent.dataValues.userId),
+  },
+  Vote: {
+    user: (parent, args, { db }) => db.user.findByPk(parent.dataValues.userId),
+    item: (parent, args, { db }) => db.item.findByPk(parent.dataValues.itemId),
+    tag: (parent, args, { db }) => db.tag.findByPk(parent.dataValues.tagId),
   },
   Query: {
     items: (root, args, { db }) => {
@@ -120,7 +129,7 @@ const resolvers = {
     },
     createTag: async (root, args, { db }) => {
       const results = await db.tag.create({
-        userid: args.userid,
+        name: args.name,
         createById: args.createById,
       });
       return {
@@ -157,7 +166,11 @@ const resolvers = {
       };
     },
     createVote: async (root, args, { db }) => {
-      const results = await db.vote.create({ tagId: args.tagId, userId: args.userId });
+      const results = await db.vote.create({
+        tagId: args.tagId,
+        userId: args.userId,
+        itemId: args.itemId,
+      });
       return {
         success: results && results.length,
         message: "vote created",
