@@ -2,6 +2,7 @@ const express = require("express");
 const { ApolloServer, gql } = require("apollo-server-express");
 const db = require("./models/index.js");
 const { GraphQLScalarType } = require("graphql");
+var cors = require("cors");
 
 const typeDefs = gql`
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
@@ -218,6 +219,8 @@ const resolvers = {
 const server = new ApolloServer({ typeDefs, resolvers, context: { db } });
 
 const app = express();
+
+app.use(cors());
 
 server.applyMiddleware({ app }); // app is from an existing express app. Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
